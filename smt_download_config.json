@@ -1,0 +1,9 @@
+{
+  "download_label": "smt",
+  "oauth_token": "",
+  "save_csvs": "False",
+  "use_sql": "True",
+  "sql_server": "<>",
+  "database": "SmartMeter",
+  "table": "Reads"
+}
