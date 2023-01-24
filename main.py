@@ -40,7 +40,8 @@ def main():
         # TODO(developer) - Handle errors from gmail API.
         print(f'An error occurred: {error}')
 
-
+# os.system('. /bin/msodbc.sh')
+# time.sleep(10)
 while True:
   # we put this here so that the sleep time can be updated in real time.
   try:
@@ -51,5 +52,6 @@ while True:
   try:
     main()
   except Exception as e: print(e)
-
+  
+  logging.info(f"sleeping {sleep_time}s")
   time.sleep(sleep_time)
