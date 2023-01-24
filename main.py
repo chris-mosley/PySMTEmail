@@ -1,13 +1,14 @@
 from pysmtemail import read_config,get_oauth,get_latest_readdate,download_attachment,insert_sql
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
+import time
+import logging
+import os
 def main():
     
     config=read_config()
     creds=get_oauth()
     most_recent_read=get_latest_readdate()
-    # most_recent_read='2023-01-16'
     try:
         # Call the Gmail API
         service = build('gmail', 'v1', credentials=creds)
@@ -40,4 +41,15 @@ def main():
         print(f'An error occurred: {error}')
 
 
-main()
+while True:
+  # we put this here so that the sleep time can be updated in real time.
+  try:
+    sleep_time = read_config()['polling_rate']
+  except:
+    logging.warning("polling_rate does not appear to be set correctly.  defaulting to 1d.")
+    sleep_time = 86400
+  try:
+    main()
+  except Exception as e: print(e)
+
+  time.sleep(sleep_time)

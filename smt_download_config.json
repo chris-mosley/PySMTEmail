@@ -1,9 +1,12 @@
 {
+  "polling_rate": 86400,
   "download_label": "smt",
-  "oauth_token": "",
   "save_csvs": "False",
   "use_sql": "True",
-  "sql_server": "<>",
+  "use_sql_trusted_connection": "False",
+  "sql_user": "pysmtdownloader",
+  "sql_pass": "pysmtemail",
+  "sql_server": "<SQLSERVERNAME>",
   "database": "SmartMeter",
   "table": "Reads"
 }

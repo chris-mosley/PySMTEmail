@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import os.path
-
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -16,8 +15,6 @@ import logging
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
-
-# most_recent_read = '2023-01-08'
 
 def download_attachment(service,messageid):
     
@@ -48,7 +45,10 @@ def download_attachment(service,messageid):
 
 def insert_sql(data):
     config = read_config()
-    conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"'Trusted_Connection=yes;')
+    if config['use_sql_trusted_connection']:
+        conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"'Trusted_Connection=yes;')
+    else:
+        conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"f"User Id={config['sql_user']};Password={config['sql_pass']}")
     cursor = conn.cursor()
 
     rows=[]
@@ -64,7 +64,6 @@ def insert_sql(data):
     
     inserts = f"INSERT INTO {config['table']} (DT,KWH,TimeStart,TimeEnd,ReadDate) VALUES"
     for row in rows:
-        # date_string = datetime.strptime(f"{row['USAGE_DATE']}{row['USAGE_END_TIME']}", '%m/%d/%Y %H:%M')
         insert=f"(\'{row['DT']}\',\'{row['KWH']}\',\'{row['TimeStart']}\',\'{row['TimeEnd']}\',\'{row['ReadDate']}\'),"
         inserts+=(insert)
     
@@ -74,14 +73,16 @@ def insert_sql(data):
 
     cursor.commit()
     cursor.close()
-    # conn.close()
-
+    
     return
 
 
 def get_latest_readdate():
     config = read_config()
-    conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"'Trusted_Connection=yes;')
+    if config['use_sql_trusted_connection']:
+        conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"'Trusted_Connection=yes;')
+    else:
+        conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"f"User Id={config['sql_user']};Password={config['sql_pass']}")
 
     cursor = conn.cursor()
     cursor.execute(f"SELECT top (1) [DT] FROM {config['table']} order by DT desc")
@@ -97,28 +98,34 @@ def get_latest_readdate():
     return latest_date
 
 def read_config() -> dict:
-    if os.path.exists('smt_download_config.json'):
-        json_path=open('smt_download_config.json','r')
-        config = json.load(json_path) 
+    if os.path.exists('/config/smt_download_config.json'):
+        json_path=open('/config/smt_download_config.json','r')
+        try:
+            config = json.load(json_path) 
+        except:
+            logging.warning("/config/smt_download.json does not appear to be valid.")
+            exit()
         json_path.close()
-        return config
+    else:
+        logging.warning("/config/smt_download.json appears to be missing.")
+    return config
         
 def get_oauth():
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    if os.path.exists('/config/token.json'):
+        creds = Credentials.from_authorized_user_file('/config/token.json', SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                '/config/credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('token.json', 'w') as token:
+        with open('/config/token.json', 'w') as token:
             token.write(creds.to_json())
     return creds

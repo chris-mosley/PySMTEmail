@@ -1,8 +1,9 @@
 -- This script is really basic.  It should be OK but use at your own risk.
 
+
+
 USE [master]
 GO
-
 CREATE DATABASE [SmartMeter]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -137,3 +138,26 @@ CREATE TABLE [dbo].[Reads](
 GO
 
 
+
+USE [master]
+GO
+declare @password as varchar(20)='pysmtemail123!' -- the default password here is pysmtemail123!.  it is highly recommend you modify this and update your smt_download_config.json accordingly.
+declare @createlogin varchar(200)
+set @createlogin='CREATE LOGIN [pysmtdownloader] WITH PASSWORD=''' + @password + ''', DEFAULT_DATABASE=[SmartMeter], CHECK_EXPIRATION=ON, CHECK_POLICY=ON'
+
+Exec (@createlogin)
+GO
+use [master];
+GO
+USE [SmartMeter]
+GO
+CREATE USER [pysmtdownloader] FOR LOGIN [pysmtdownloader]
+GO
+USE [SmartMeter]
+GO
+ALTER ROLE [db_datareader] ADD MEMBER [pysmtdownloader]
+GO
+USE [SmartMeter]
+GO
+ALTER ROLE [db_datawriter] ADD MEMBER [pysmtdownloader]
+GO
