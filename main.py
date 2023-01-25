@@ -3,12 +3,12 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import time
 import logging
-import pyodbc
 def main():
     
     config=read_config()
     creds=get_oauth()
     most_recent_read=get_latest_readdate()
+    logging.info(f"most_recent_read returned as {most_recent_read}")
     try:
         # Call the Gmail API
         service = build('gmail', 'v1', credentials=creds)
@@ -16,7 +16,7 @@ def main():
         labels = results.get('labels', [])
 
         if not labels:
-            print('No labels found.')
+            logging.error('No labels found.')
             return
         for label in labels:
             if label['name'] == config['download_label']:
@@ -24,14 +24,16 @@ def main():
                 break
 
         if label_id is None:
-            print(f"label {config['download_label']} not found.")
+            logging.error(f"label {config['download_label']} not found.")
             return
         message_list = service.users().messages().list(userId='me',labelIds=label_id,q=f"after:{most_recent_read}").execute()['messages']
-        # messages = message_results.get('me')
+        logging.info(f"Returned {len(message_list)} messages")
+        logging.debug(message_list)
         for message in message_list:
-            # pprint(message)
+            logging.debug(message)
             attachment_dict=download_attachment(service,message['id'])
             if config['use_sql']:
+                logging.info("using sql")
                 insert_sql(attachment_dict)
             
 
@@ -40,12 +42,9 @@ def main():
         # TODO(developer) - Handle errors from gmail API.
         print(f'An error occurred: {error}')
 
-# os.system('. /bin/msodbc.sh')
-# time.sleep(10)
 logging.getLogger().setLevel(read_config()['log_level'])
 while True:
   
-  print(pyodbc.drivers())
   # we put this here so that the sleep time can be updated in real time.
   try:
     sleep_time = read_config()['polling_rate']

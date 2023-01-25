@@ -13,12 +13,12 @@ from datetime import datetime
 import logging
 
 
-# If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
 
 def download_attachment(service,messageid):
     
     msg = service.users().messages().get(userId='me', id=messageid).execute()
+    logging.debug(msg)
     parts = msg.get('payload').get('parts')
     all_parts = []
     for part in parts:
@@ -45,8 +45,8 @@ def download_attachment(service,messageid):
 
 def insert_sql(data):
     config = read_config()
-    logging.debug(print(config))
-    if config['use_sql_trusted_connection'] is True:
+    logging.debug("insert_sql running")
+    if config['use_sql_trusted_connection'] == 'True':
         logging.info("use_sql_trusted_connection is True, using trusted connection.")
         conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"'Trusted_Connection=yes;')
     else:
@@ -67,25 +67,34 @@ def insert_sql(data):
         }
         rows.append(column_values)
     
-    inserts = f"INSERT INTO {config['table']} (DT,KWH,TimeStart,TimeEnd,ReadDate) VALUES"
-    for row in rows:
-        insert=f"(\'{row['DT']}\',\'{row['KWH']}\',\'{row['TimeStart']}\',\'{row['TimeEnd']}\',\'{row['ReadDate']}\'),"
-        inserts+=(insert)
-    
-    inserts=inserts.rstrip(',')
-    logging.debug(inserts)
-    cursor.execute(inserts)
+    # we use upserts because google's filter doesn't always return perfect results.  its pretty upserting.
+    upserts = [create_upsert(config['table'],row) for row in rows]
+    upserts = ";".join(upserts)
+    logging.debug(upserts)
+    cursor.execute(upserts)
 
     cursor.commit()
     cursor.close()
     
     return
 
+def create_upsert(table,row):
+    logging.debug("creating upsert")
+    upsert=f"""UPDATE {table} set [KWH] = '{row['KWH']}', [TimeStart] = '{row['TimeStart']}', [TimeEnd] = '{row['TimeEnd']}', [ReadDate] = '{row['ReadDate']}' where [DT] = '{row['DT']}'
+    if @@ROWCOUNT = 0 INSERT INTO {table} (DT,KWH,TimeStart,TimeEnd,ReadDate) VALUES('{row['DT']}','{row['KWH']}','{row['TimeStart']}','{row['TimeEnd']}','{row['ReadDate']}')"""
+    
+    logging.debug(f"created upsert {upsert}")
+    return upsert
 
 def get_latest_readdate():
     config = read_config()
+    
+    if config['backfill'] == True:
+        logging.info("Backfill mode enabled.  Going allllllll the way back.  Not recommended for ongoing use.")
+        return '1970-01-01'
+
     logging.debug(print(config))
-    if config['use_sql_trusted_connection'] is True:
+    if config['use_sql_trusted_connection'] == 'True':
         logging.info("use_sql_trusted_connection is True, using trusted connection.")
         conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"'Trusted_Connection=yes;')
     else:
@@ -95,15 +104,17 @@ def get_latest_readdate():
 
     cursor = conn.cursor()
     cursor.execute(f"SELECT top (1) [DT] FROM {config['table']} order by DT desc")
+    
 
     for i in cursor:
         latest_date=i[0].strftime("%Y-%m-%d")
-        print(latest_date)
+    
     # return the epoch if your database is new.
     try: latest_date
     except:
         logging.info('sql database appears to be empty.  Starting from the beginning.')
         return '1970-01-01'
+    logging.info(f"latest insert returned is {latest_date}")
     return latest_date
 
 def read_config() -> dict:
@@ -121,6 +132,7 @@ def read_config() -> dict:
         
 def get_oauth():
     creds = None
+    SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
