@@ -1,0 +1,8 @@
+version: "3"
+services:
+    pysmtreader:
+        container_name: pysmtemail
+        image: cmosley/pysmtemail:latest
+        volumes:
+            - /etc/pysmtemail:/config
+        restart: unless-stopped
