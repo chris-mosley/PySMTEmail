@@ -3,7 +3,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import time
 import logging
-import os
+import pyodbc
 def main():
     
     config=read_config()
@@ -42,7 +42,10 @@ def main():
 
 # os.system('. /bin/msodbc.sh')
 # time.sleep(10)
+logging.getLogger().setLevel(read_config()['log_level'])
 while True:
+  
+  print(pyodbc.drivers())
   # we put this here so that the sleep time can be updated in real time.
   try:
     sleep_time = read_config()['polling_rate']

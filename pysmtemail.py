@@ -45,10 +45,15 @@ def download_attachment(service,messageid):
 
 def insert_sql(data):
     config = read_config()
-    if config['use_sql_trusted_connection']:
+    logging.debug(print(config))
+    if config['use_sql_trusted_connection'] is True:
+        logging.info("use_sql_trusted_connection is True, using trusted connection.")
         conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"'Trusted_Connection=yes;')
     else:
-        conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"f"User Id={config['sql_user']};Password={config['sql_pass']}")
+        logging.info("use_sql_trusted_connection is False, using sql_user and sql_pass.")
+        logging.debug("using connection string: "'Driver={ODBC Driver 18 for SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"f"UID={config['sql_user']};PWD={config['sql_pass']};Encrypt=yes;TrustServerCertificate=yes")
+        conn = pyodbc.connect('Driver={ODBC Driver 18 for SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"f"UID={config['sql_user']};PWD={config['sql_pass']};Encrypt=yes;TrustServerCertificate=yes")
+    
     cursor = conn.cursor()
 
     rows=[]
@@ -68,7 +73,7 @@ def insert_sql(data):
         inserts+=(insert)
     
     inserts=inserts.rstrip(',')
-    print(inserts)
+    logging.debug(inserts)
     cursor.execute(inserts)
 
     cursor.commit()
@@ -79,10 +84,14 @@ def insert_sql(data):
 
 def get_latest_readdate():
     config = read_config()
-    if config['use_sql_trusted_connection']:
+    logging.debug(print(config))
+    if config['use_sql_trusted_connection'] is True:
+        logging.info("use_sql_trusted_connection is True, using trusted connection.")
         conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"'Trusted_Connection=yes;')
     else:
-        conn = pyodbc.connect('Driver={SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"f"User Id={config['sql_user']};Password={config['sql_pass']}")
+        logging.info("use_sql_trusted_connection is False, using sql_user and sql_pass.")
+        logging.debug("using connection string: "'Driver={ODBC Driver 18 for SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"f"User Id={config['sql_user']};Password={config['sql_pass']};Encrypt=yes;TrustServerCertificate=yes")
+        conn = pyodbc.connect('Driver={ODBC Driver 18 for SQL Server};'f"Server={config['sql_server']};"f"Database={config['database']};"f"UID={config['sql_user']};PWD={config['sql_pass']};Encrypt=yes;TrustServerCertificate=yes")
 
     cursor = conn.cursor()
     cursor.execute(f"SELECT top (1) [DT] FROM {config['table']} order by DT desc")
