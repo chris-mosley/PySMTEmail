@@ -11,7 +11,7 @@ The other reason you might want to use this would be to get higher resolution.  
 The primary downside is that you have to wait until end-of-day to get your data.  This also complicates something like a metric exporter because prometheus doesn't really want to deal with included timestamps.  This is a problem on the todo list.
 
 ## SQL
-Currently this inserts into a table in an MSSQL Server.  I also need to throw together a script to generate this database and table.  Eventually I hope to create an exporter or some other solution to get this into Prometheus.  There is much work to do.
+Currently this inserts into a table in an MSSQL Server. the createdatabase.sql file in the repo will create the database and table for you.
 
 ## Grafana
 I have included a basic grafana dashboard to view this once you have it in SQL.
