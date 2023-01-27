@@ -24,3 +24,22 @@ So for those that are so inclined the steps to make this work are
 - Create an account at [SmartMeterTexas](https://www.smartmetertexas.com), your ESIID can be found on your electric bill
 - Under Manage Subscriptions, create new subscription to email you 15 Minute Interval CSVs every day.
 - In GMail create a rule to automatically add the "smt" label to every email, the easiest way to do this would be to import the pysmtemailfilter.xml file in the repo.
+
+- Log into the [Google Cloud Console](https://console.cloud.google.com)
+- Create a new project, or use an existing one if you know what you're doing.
+- On your project page, go to "Enabled APIs and services"
+- At the top, click "+ Enable APIS AND SERVICES"
+- Search for "Gmail API" and select "Gmail API" in the result list
+- Enable API
+- On OAuth consent screen click "Edit App"
+- App name can be anything.  Fill in your email and an arbitrary website for the Authorized Domains. -> Save and Continue
+- Add or remove Scopes
+- Enable the https://www.googleapis.com/auth/gmail.readonly scope.
+- Go to APIs & Services > Credentials > Create Credentials > Oauth client ID
+- Save and continue.  Be sure that your email is one of the test users.
+
+- For Application type select "Desktop app"
+-   You can name this anything you want.
+- Click "DOWNLOAD JSON" and save this as "credentials.json" in the same directory as generate_token.py
+
+### I know this is a ridiculous list of steps.  I'm working on trying to simplify this.
