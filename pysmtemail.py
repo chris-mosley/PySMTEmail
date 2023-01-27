@@ -11,6 +11,7 @@ from base64 import urlsafe_b64decode
 import csv
 from datetime import datetime
 import logging
+from zoneinfo import ZoneInfo
 
 
 
@@ -63,7 +64,8 @@ def insert_sql(data):
             "KWH" : row['USAGE_KWH'],
             "TimeStart" : f"{row['USAGE_START_TIME']}",
             "TimeEnd" : f"{row['USAGE_END_TIME']}",
-            "ReadDate" : f"{row['USAGE_DATE']}"
+            "ReadDate" : f"{row['USAGE_DATE']}",
+            "UTC": (datetime.strptime(f"{row['USAGE_DATE']} {row['USAGE_END_TIME']}", '%m/%d/%Y %H:%M')).replace(tzinfo=ZoneInfo('US/Central')).astimezone(ZoneInfo('UTC'))
         }
         rows.append(column_values)
     
@@ -80,8 +82,8 @@ def insert_sql(data):
 
 def create_upsert(table,row):
     logging.debug("creating upsert")
-    upsert=f"""UPDATE {table} set [KWH] = '{row['KWH']}', [TimeStart] = '{row['TimeStart']}', [TimeEnd] = '{row['TimeEnd']}', [ReadDate] = '{row['ReadDate']}' where [DT] = '{row['DT']}'
-    if @@ROWCOUNT = 0 INSERT INTO {table} (DT,KWH,TimeStart,TimeEnd,ReadDate) VALUES('{row['DT']}','{row['KWH']}','{row['TimeStart']}','{row['TimeEnd']}','{row['ReadDate']}')"""
+    upsert=f"""UPDATE {table} set [DT] = '{row['DT']}', [KWH] = '{row['KWH']}', [TimeStart] = '{row['TimeStart']}', [TimeEnd] = '{row['TimeEnd']}', [ReadDate] = '{row['ReadDate']}' where [UTC] = '{row['UTC']}'
+    if @@ROWCOUNT = 0 INSERT INTO {table} (UTC,DT,KWH,TimeStart,TimeEnd,ReadDate) VALUES('{row['UTC']}','{row['DT']}','{row['KWH']}','{row['TimeStart']}','{row['TimeEnd']}','{row['ReadDate']}')"""
     
     logging.debug(f"created upsert {upsert}")
     return upsert

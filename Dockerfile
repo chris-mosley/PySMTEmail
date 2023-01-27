@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM python:3.10-alpine
 
 
 RUN apk update && apk add build-base unixodbc unixodbc-dev curl gpg gnupg
@@ -16,7 +16,7 @@ RUN gpg --verify mssql-tools18_18.1.1.1-1_amd64.sig mssql-tools18_18.1.1.1-1_amd
 RUN apk add --allow-untrusted msodbcsql18_18.1.2.1-1_amd64.apk
 RUN apk add --allow-untrusted mssql-tools18_18.1.1.1-1_amd64.apk
 
-RUN pip3 install requests setuptools pyodbc google-api-python-client google-auth-httplib2 google-auth-oauthlib 
+RUN pip3 install requests setuptools pyodbc google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
 COPY ./*.py /bin/
 WORKDIR /bin

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns='http://www.w3.org/2005/Atom' xmlns:apps='http://schemas.google.com/apps/2006'>
+	<title>Mail Filters</title>
+	<id>tag:mail.google.com,2008:filters:z0000001665607547608*3622452905966864045</id>
+	<updated>2023-01-25T21:36:07Z</updated>
+	<author>
+		<name>Chris Mosley</name>
+	</author>
+	<entry>
+		<category term='filter'></category>
+		<title>Mail Filter</title>
+		<id>tag:mail.google.com,2008:filter:z0000001665607547608*3622452905966864045</id>
+		<updated>2023-01-25T21:36:07Z</updated>
+		<content></content>
+		<apps:property name='from' value='info@communications.smartmetertexas.com'/>
+		<apps:property name='subject' value='subscription report'/>
+		<apps:property name='hasAttachment' value='true'/>
+		<apps:property name='label' value='smt'/>
+		<apps:property name='shouldNeverSpam' value='true'/>
+		<apps:property name='sizeOperator' value='s_sl'/>
+		<apps:property name='sizeUnit' value='s_smb'/>
+	</entry>
+</feed>

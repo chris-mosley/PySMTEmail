@@ -18,3 +18,9 @@ I have included a basic grafana dashboard to view this once you have it in SQL.
 
 ### Disclaimer.  
 As of writing this is currently still very very new.  You will need to get your own API key authorized for your gmail account, [this page](https://developers.google.com/gmail/api/quickstart/python) should give you all the steps you need to get started of you're really insistent on doing it _now_.
+
+## I want to use it RIGHT NOW!
+So for those that are so inclined the steps to make this work are
+- Create an account at [SmartMeterTexas](https://www.smartmetertexas.com), your ESIID can be found on your electric bill
+- Under Manage Subscriptions, create new subscription to email you 15 Minute Interval CSVs every day.
+- In GMail create a rule to automatically add the "smt" label to every email, the easiest way to do this would be to import the pysmtemailfilter.xml file in the repo.

@@ -125,6 +125,7 @@ GO
 
 CREATE TABLE [dbo].[Reads](
 	[ID] [bigint] IDENTITY(1,1) NOT NULL,
+	[UTC] [datetime2](7) NOT NULL,
 	[DT] [datetime] NOT NULL,
 	[KWH] [decimal](5, 3) NOT NULL,
 	[TimeStart] [time](0) NOT NULL,
