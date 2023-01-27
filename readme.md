@@ -25,6 +25,8 @@ So for those that are so inclined the steps to make this work are
 - Under Manage Subscriptions, create new subscription to email you 15 Minute Interval CSVs every day.
 - In GMail create a rule to automatically add the "smt" label to every email, the easiest way to do this would be to import the pysmtemailfilter.xml file in the repo.
 
+- On your SQL server run createdatabase.sql
+
 - Log into the [Google Cloud Console](https://console.cloud.google.com)
 - Create a new project, or use an existing one if you know what you're doing.
 - On your project page, go to "Enabled APIs and services"
@@ -41,5 +43,8 @@ So for those that are so inclined the steps to make this work are
 - For Application type select "Desktop app"
 -   You can name this anything you want.
 - Click "DOWNLOAD JSON" and save this as "credentials.json" in the same directory as generate_token.py
+- Run generate_token.py.  It will pop up an oauth screen for you to accept.  (this requires python 3.10)
+- Copy token.json to be next to your smt_download_config.json file
+- The docker image is at cmosley/pysmtemail:latest, please check docker-compose.yaml.
 
-### I know this is a ridiculous list of steps.  I'm working on trying to simplify this.
+### I know this is a ridiculous list of steps.  I'm working on trying to simplify this, mostly all the API stuff.
