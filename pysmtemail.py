@@ -29,7 +29,7 @@ def download_attachment(service,messageid):
             all_parts.append(part)
 
     for part in all_parts:
-        if bool(re.search('.*(\.CSV)', part['filename'])):
+        if bool(re.search('.*(\.CSV)', part['filename'], flags=re.IGNORECASE)):
             attachmentId = part['body']['attachmentId']
             file_name = part['filename']
     

@@ -47,8 +47,4 @@ if not creds or not creds.valid:
         print("\nnote, this token gives full read access to your email.  And it can renew itself.  Be careful with it.")
 else:
   print(f"{os.path.join(os.getcwd(),'token.json')} appears to be a valid token.")
-
-
-
-
-
+  

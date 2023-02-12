@@ -11,7 +11,7 @@ The other reason you might want to use this would be to get higher resolution.  
 The primary downside is that you have to wait until end-of-day to get your data.  This also complicates something like a metric exporter because prometheus doesn't really want to deal with included timestamps.  This is a problem on the todo list.
 
 ## SQL
-Currently this inserts into a table in an MSSQL Server.  I also need to throw together a script to generate this database and table.  Eventually I hope to create an exporter or some other solution to get this into Prometheus.  There is much work to do.
+Currently this inserts into a table in an MSSQL Server. the createdatabase.sql file in the repo will create the database and table for you.
 
 ## Grafana
 I have included a basic grafana dashboard to view this once you have it in SQL.
@@ -26,6 +26,7 @@ So for those that are so inclined the steps to make this work are
 - In GMail create a rule to automatically add the "smt" label to every email, the easiest way to do this would be to import the pysmtemailfilter.xml file in the repo.
 
 - On your SQL server run createdatabase.sql
+- Set the sql_server in smt_download_config.json to the name of your sql instance.
 
 - Log into the [Google Cloud Console](https://console.cloud.google.com)
 - Create a new project, or use an existing one if you know what you're doing.
