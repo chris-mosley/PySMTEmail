@@ -85,7 +85,7 @@ def create_upsert(table,row):
     upsert=f"""UPDATE {table} set [DT] = '{row['DT']}', [KWH] = '{row['KWH']}', [TimeStart] = '{row['TimeStart']}', [TimeEnd] = '{row['TimeEnd']}', [ReadDate] = '{row['ReadDate']}' where [UTC] = '{row['UTC']}'
     if @@ROWCOUNT = 0 INSERT INTO {table} (UTC,DT,KWH,TimeStart,TimeEnd,ReadDate) VALUES('{row['UTC']}','{row['DT']}','{row['KWH']}','{row['TimeStart']}','{row['TimeEnd']}','{row['ReadDate']}')"""
     
-    logging.debug(f"created upsert {upsert}")
+    logging.debug(f"created upsert: {upsert}")
     return upsert
 
 def get_latest_readdate():
